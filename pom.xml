@@ -79,7 +79,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>com.example.demo.DemoApplication</mainClass>
+                    <mainClass>com.robot.ai.DemoApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

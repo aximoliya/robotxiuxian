@@ -8,10 +8,12 @@ import com.forte.qqrobot.beans.messages.msgget.GroupMsg;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.sender.MsgSender;
 import com.robot.ai.jdbc.Bean.User;
+import com.robot.ai.xiuxian.bean.BackPack;
 import com.robot.ai.xiuxian.bean.XiaoGuai;
 import com.simplerobot.modules.utils.KQCodeUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Beans
@@ -206,7 +208,6 @@ public class PracticeMain {
                 "1.百岁山\r\n" +
                 "例如：前往 百岁山\r\n" +
                 "注意空格");
-        //我好帅
     }
    /* @Listen(MsgGetTypes.privateMsg)
     @Filter("历练.*")
@@ -378,9 +379,14 @@ public class PracticeMain {
                             switch (msgXiaoGuaiName){//判断小怪是否存在
                                 case "毛虫":
                                     if (daJia(XiuXianUtil.getXiaoGuaiShuXin(msgXiaoGuaiName), qq)) {
+                                        ArrayList trophy = trophy(msgXiaoGuaiName);
+                                        XiuXianUtil.jiashuxing(qq,"checkexp", Integer.parseInt(trophy.get(0).toString().substring(0,1)));//添加经验
+                                        if (trophy.size() == 2) {
+                                            XiuXianUtil.acquisition(qq,trophy.get(1).toString());//添加物品
+                                        }
                                         String s = "你战胜了"+msgXiaoGuaiName+"\n" +
                                                 "战利品：\n" +
-                                                "";
+                                                trophy.toString();
                                         send.SENDER.sendGroupMsg(msg,s);
                                     }else {
                                         send.SENDER.sendGroupMsg(msg,"你被"+msgXiaoGuaiName+"干碎了");
@@ -409,6 +415,32 @@ public class PracticeMain {
 
 
     @Listen(MsgGetTypes.groupMsg)
+    @Filter("查看背包")
+    public void backPack(GroupMsg msg,MsgSender sender){
+        String qq = msg.getQQ();
+        String msgMsg = msg.getMsg();
+        if (XiuXianUtil.isUser(qq) > 0) {//判断用户是否注册
+            List<BackPack> items = XiuXianUtil.getItems(qq);//获取背包物品
+            StringBuilder builder = new StringBuilder();
+            builder.append("背包\n物品名称    数量\n");
+            for (BackPack item : items) {
+                item.getNumber();
+                //builder.append();
+            }
+            sender.SENDER.sendGroupMsg(msg,"");
+        }else {
+            sender.SENDER.sendGroupMsg(msg,"未注册");
+        }
+    }
+
+
+    @Listen(MsgGetTypes.groupMsg)
+    @Filter("装备.*")
+    public void equip(GroupMsg msg,MsgSender sender){
+
+    }
+
+    @Listen(MsgGetTypes.groupMsg)
     @Filter("注销.*")
     public void logOut(GroupMsg msg, MsgSender send) {
         String qq = msg.getQQ();
@@ -431,6 +463,9 @@ public class PracticeMain {
             send.SENDER.sendGroupMsg(msg, "格式不正确");
         }
     }
+
+
+
 
 
     //管理员
@@ -574,9 +609,9 @@ public class PracticeMain {
             case "毛虫":
                 String[] strings= {"新手剑","新手衣","新手裤","新手鞋"};
                 int nextInt = random.nextInt(2);
-                zlp.add(nextInt+"");
+                zlp.add(nextInt+"点灵气");//灵气
                 int i = random.nextInt(100) + 1;
-                if (i>=1 && i<=5){
+                if (i>=1 && i<=5){//装备掉落
                     int nextInt1 = random.nextInt(4);
                     zlp.add(strings[nextInt1]);
                     return zlp;

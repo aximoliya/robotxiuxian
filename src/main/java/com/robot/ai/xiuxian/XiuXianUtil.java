@@ -4,9 +4,13 @@ package com.robot.ai.xiuxian;
 
 import com.robot.ai.jdbc.Bean.User;
 import com.robot.ai.jdbc.BeanHandler;
+import com.robot.ai.jdbc.BeanListHandler;
 import com.robot.ai.jdbc.CRUDTemplate;
+import com.robot.ai.xiuxian.bean.BackPack;
 import com.robot.ai.xiuxian.bean.XiaoGuai;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class XiuXianUtil {
@@ -103,13 +107,22 @@ public class XiuXianUtil {
 
     //单独加属性
     public static void jiashuxing(String qq,String nage,int duoshao){
-        if ("checkexp".equals(nage)){
-            if (duoshao < 0){
-                duoshao = 0;
-            }
-            String sql = "update user set checkexp = ? where id = ?";
-            CRUDTemplate.executeUpdate(sql,duoshao,qq);
+        User user = getUser(qq);//获取用户
+        switch (nage){
+            case "checkexp":
+                int checkexp = user.getCheckexp()+duoshao;//添加后的经验
+                String sql = "update user set checkexp = ? where id = ?";
+                CRUDTemplate.executeUpdate(sql,checkexp,qq);
+                break;
         }
+
+//        if ("checkexp".equals(nage)){
+//            if (duoshao < 0){
+//                duoshao = 0;
+//            }
+//            String sql = "update user set checkexp = ? where id = ?";
+//            CRUDTemplate.executeUpdate(sql,duoshao,qq);
+//        }
 
     }
 
@@ -124,5 +137,30 @@ public class XiuXianUtil {
     public static boolean position(String id,String weizhi){
         String sql = "update user set weizhi = ? where id = ?";
         return CRUDTemplate.executeUpdate(sql, weizhi,id) == 1;
+    }
+
+    //获取所有物品列表
+    public static List<BackPack> getItems(String qq){
+        String sql = "select * from backpack where qq = ?";
+        return CRUDTemplate.executeQuery(sql,new BeanListHandler<>(BackPack.class),qq);
+    }
+
+    //获取单个物品
+    public static BackPack queryItems(String qq,String itemName){
+        String sql = "select * from backpack where qq = ? and szname = ?";//查询sql语句
+        return CRUDTemplate.executeQuery(sql,new BeanHandler<>(BackPack.class),qq,itemName);
+    }
+
+    //添加物品
+    public static boolean acquisition(String id,String wupingname){
+        BackPack backPack = queryItems(id, wupingname);
+        if (backPack != null){//判断物品是否存在如果存在则添加数量不存在则添加物品
+            int number = backPack.getNumber()+1;
+            String sql = "update backpack set number = ? where qq = ?";
+            return CRUDTemplate.executeUpdate(sql,number,id) == 1;
+        }else {
+            String sql = "insert into backpack (qq,szname,number) values (?,?,?)";//添加物品sql
+            return CRUDTemplate.executeUpdate(sql,id,wupingname,1) == 1;//添加成功返回true
+        }
     }
 }
