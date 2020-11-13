@@ -206,6 +206,7 @@ public class PracticeMain {
                 "1.百岁山\r\n" +
                 "例如：前往 百岁山\r\n" +
                 "注意空格");
+        //我好帅
     }
 
    /* @Listen(MsgGetTypes.privateMsg)
