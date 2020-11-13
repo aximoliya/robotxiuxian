@@ -208,7 +208,6 @@ public class PracticeMain {
                 "注意空格");
         //我好帅
     }
-
    /* @Listen(MsgGetTypes.privateMsg)
     @Filter("历练.*")
     public void privatLilian(PrivateMsg msg, MsgSender send){
